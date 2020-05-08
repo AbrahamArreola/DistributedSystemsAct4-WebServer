@@ -1,0 +1,1 @@
+An implementation of a webserver where an user can manage scholar data from a form loaded by the server which sends GET and POST http requests
