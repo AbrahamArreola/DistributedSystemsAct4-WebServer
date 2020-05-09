@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agregar calificación</title>
+    <title>Promedio de materia</title>
     <style>
         body{
             background-color: rgb(13, 163, 218);
@@ -29,7 +29,7 @@
             text-align: center;
             font-size: 22px;
         }
-
+        
         .container p{
             margin: 0;
             padding: 0;
@@ -61,15 +61,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>Agregar Calificación</h1>
-        <form action="/add_score" method="POST">
-            <p>Alumno</p>
-            <input type="text" name="student" placeholder="Ingrese nombre de alumno">
+        <h1>Obtener promedio de materia</h1>
+        <form action="/subject_average" method="POST">
             <p>Materia</p>
             <input type="text" name="subject" placeholder="Ingrese nombre de materia">
-            <p>Calificación</p>
-            <input type="text" name="score" placeholder="Ingrese calificación">
-            <input type="submit" value="Agregar">
+            <input type="submit" value="Obtener promedio">
             <p>%s</p>
         </form>
     </div>

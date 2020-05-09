@@ -4,7 +4,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 )
+
+var students = make(map[string]map[string]float32)
+var subjects = make(map[string]map[string]float32)
 
 func loadHTML(path string) string {
 	html, _ := ioutil.ReadFile(path)
@@ -12,20 +16,142 @@ func loadHTML(path string) string {
 	return string(html)
 }
 
-func index(response http.ResponseWriter, request *http.Request) {
+func executeResponse(response http.ResponseWriter, request *http.Request, html string, responseString string) {
 	response.Header().Set(
 		"Content-Type",
 		"text/html",
 	)
 	fmt.Fprintf(
 		response,
-		loadHTML("../Pages/add_score.html"),
+		loadHTML(html),
+		responseString,
 	)
+}
+
+func addScore(response http.ResponseWriter, request *http.Request) {
+	responseString := ""
+
+	switch request.Method {
+	case "POST":
+		if err := request.ParseForm(); err != nil {
+			fmt.Fprintf(response, "ParseForm() error %v", err)
+			return
+		}
+
+		student := request.FormValue("student")
+		subject := request.FormValue("subject")
+		score, err := strconv.ParseFloat(request.FormValue("score"), 32)
+		if err != nil {
+			return
+		}
+
+		if _, exists := subjects[subject]; !exists {
+			subjects[subject] = make(map[string]float32)
+		}
+
+		if _, exists := students[student]; !exists {
+			students[student] = make(map[string]float32)
+		}
+
+		if _, exists := subjects[subject][student]; !exists {
+			students[student][subject] = float32(score)
+			subjects[subject][student] = float32(score)
+			responseString = "Calificación agregada!"
+		} else {
+			responseString = "Error: calificación existente"
+		}
+	}
+	executeResponse(response, request, "../Pages/add_score.html", responseString)
+}
+
+func studentAverage(response http.ResponseWriter, request *http.Request) {
+	responseString := ""
+
+	switch request.Method {
+	case "POST":
+		if err := request.ParseForm(); err != nil {
+			fmt.Fprintf(response, "ParseForm() error %v", err)
+			return
+		}
+
+		student := request.FormValue("student")
+		if _, exists := students[student]; exists {
+			var average float32 = 0
+
+			for _, v := range students[student] {
+				average += v
+			}
+
+			average /= float32(len(students[student]))
+			responseString = "Promedio de alumno: " + fmt.Sprintf("%.2f", average)
+		} else {
+			responseString = "Error: alumno inexistente"
+		}
+	}
+	executeResponse(response, request, "../Pages/student_average.html", responseString)
+}
+
+func subjectAverage(response http.ResponseWriter, request *http.Request) {
+	responseString := ""
+
+	switch request.Method {
+	case "POST":
+		if err := request.ParseForm(); err != nil {
+			fmt.Fprintf(response, "ParseForm() error %v", err)
+			return
+		}
+
+		subject := request.FormValue("subject")
+		if _, exists := subjects[subject]; exists {
+			var average float32 = 0
+
+			for _, v := range subjects[subject] {
+				average += v
+			}
+
+			average /= float32(len(subjects[subject]))
+			responseString = "Promedio de materia: " + fmt.Sprintf("%.2f", average)
+		} else {
+			responseString = "Error: materia inexistente"
+		}
+	}
+	executeResponse(response, request, "../Pages/subject_average.html", responseString)
+}
+
+func totalAverage(response http.ResponseWriter, request *http.Request) {
+	responseString := ""
+
+	switch request.Method {
+	case "GET":
+		if len(students) > 0 {
+			var studentAverage float32 = 0
+			var totalAverage float32 = 0
+
+			for _, value := range students {
+				for _, v := range value {
+					studentAverage += v
+				}
+
+				studentAverage /= (float32)(len(value))
+				totalAverage += studentAverage
+				studentAverage = 0
+			}
+
+			totalAverage /= (float32)(len(students))
+			responseString = "Promedio general: " + fmt.Sprintf("%.2f", totalAverage)
+		} else {
+			responseString = "Error: Ninguna calificación capturada"
+		}
+		executeResponse(response, request, "../Pages//total_average.html", responseString)
+	}
 }
 
 func main() {
 	host := "127.0.0.1:9000"
-	http.HandleFunc("/", index)
+	http.HandleFunc("/add_score", addScore)
+	http.HandleFunc("/student_average", studentAverage)
+	http.HandleFunc("/total_average", totalAverage)
+	http.HandleFunc("/subject_average", subjectAverage)
 	fmt.Println("Servidor corriendo en:", host)
 	http.ListenAndServe(host, nil)
 }
