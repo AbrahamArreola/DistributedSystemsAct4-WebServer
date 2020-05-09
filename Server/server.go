@@ -6,26 +6,26 @@ import (
 	"net/http"
 )
 
-func loadHTML(a string) string {
-	html, _ := ioutil.ReadFile(a)
+func loadHTML(path string) string {
+	html, _ := ioutil.ReadFile(path)
 
 	return string(html)
 }
 
-func form(res http.ResponseWriter, req *http.Request) {
-	res.Header().Set(
+func index(response http.ResponseWriter, request *http.Request) {
+	response.Header().Set(
 		"Content-Type",
 		"text/html",
 	)
 	fmt.Fprintf(
-		res,
-		loadHTML("form.html"),
+		response,
+		loadHTML("../Pages/add_score.html"),
 	)
 }
 
 func main() {
 	host := "127.0.0.1:9000"
-	http.HandleFunc("/", form)
+	http.HandleFunc("/", index)
 	fmt.Println("Servidor corriendo en:", host)
 	http.ListenAndServe(host, nil)
 }

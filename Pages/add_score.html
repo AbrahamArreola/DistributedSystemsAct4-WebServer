@@ -3,9 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Agregar calificación</title>
+    <style>
+        body{
+            background-color: rgb(13, 163, 218);
+            padding: 0;
+            margin: 0;
+        }
+
+        .container{
+            width: 350px;
+            height: 400px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            top: 50%%;
+            left: 50%%;
+            position: absolute;
+            transform: translate(-50%%,-50%%);
+            box-sizing: border-box;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        h1{
+            text-align: center;
+            font-size: 22px;
+        }
+
+        .container p{
+            margin: 0;
+            padding: 0;
+            font-weight: bold;
+        }
+
+        .container input{
+            width: 100%%;
+            margin-bottom: 25px;
+            margin-top: 10px;
+            border: none;
+            outline: none;
+        }
+
+        .container input[type="text"]{
+            height: 25px;
+            color: black;
+            border-radius: 5px;
+        }
+
+        .container input[type="submit"]{
+            border-radius: 10px;
+            background-color: red;
+            color: white;
+            height: 30px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    
+    <div class="container">
+        <h1>Agregar Calificación</h1>
+        <form action="">
+            <p>Alumno</p>
+            <input type="text" placeholder="Ingrese nombre de alumno">
+            <p>Materia</p>
+            <input type="text" placeholder="Ingrese nombre de materia">
+            <p>Calificación</p>
+            <input type="text" placeholder="Ingrese calificación">
+            <input type="submit" value="Agregar">
+        </form>
+    </div>
 </body>
 </html>
