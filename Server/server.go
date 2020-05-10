@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 )
 
@@ -42,6 +44,7 @@ func addScore(response http.ResponseWriter, request *http.Request) {
 		subject := request.FormValue("subject")
 		score, err := strconv.ParseFloat(request.FormValue("score"), 32)
 		if err != nil {
+			fmt.Fprintf(response, "Error to parse string to float", err)
 			return
 		}
 
@@ -146,12 +149,60 @@ func totalAverage(response http.ResponseWriter, request *http.Request) {
 	}
 }
 
+func storageOptions(response http.ResponseWriter, request *http.Request) {
+	response.Header().Set(
+		"Content-Type",
+		"text/html",
+	)
+	fmt.Fprint(
+		response,
+		loadHTML("../Pages/storage.html"),
+	)
+}
+
+func saveInFile(response http.ResponseWriter, request *http.Request) {
+	outFile, err := os.Create("../Storage/alumnos.txt")
+	if err != nil {
+		fmt.Println("Error al convertir a JSON", err.Error())
+		return
+	}
+	codified := json.NewEncoder(outFile)
+	codified.SetIndent("", "    ")
+	if err := codified.Encode(students); err != nil {
+		fmt.Println("Error al convertir a JSON", err.Error())
+		return
+	}
+	outFile.Close()
+
+	outFile, err = os.Create("../Storage/materias.txt")
+	if err != nil {
+		fmt.Println("Error al convertir a JSON", err.Error())
+		return
+	}
+	codified = json.NewEncoder(outFile)
+	codified.SetIndent("", "    ")
+	if err := codified.Encode(subjects); err != nil {
+		fmt.Println("Error al convertir a JSON", err.Error())
+		return
+	}
+	outFile.Close()
+
+	storageOptions(response, request)
+}
+
+func loadFromFile(response http.ResponseWriter, request *http.Request) {
+
+}
+
 func main() {
 	host := "127.0.0.1:9000"
 	http.HandleFunc("/add_score", addScore)
 	http.HandleFunc("/student_average", studentAverage)
 	http.HandleFunc("/total_average", totalAverage)
 	http.HandleFunc("/subject_average", subjectAverage)
+	http.HandleFunc("/storage_options", storageOptions)
+	http.HandleFunc("/save_in_file", saveInFile)
+	http.HandleFunc("/load_from_file", loadFromFile)
 	fmt.Println("Servidor corriendo en:", host)
 	http.ListenAndServe(host, nil)
 }
