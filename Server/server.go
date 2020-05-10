@@ -191,7 +191,38 @@ func saveInFile(response http.ResponseWriter, request *http.Request) {
 }
 
 func loadFromFile(response http.ResponseWriter, request *http.Request) {
+	inFile, err := os.Open("../Storage/alumnos.txt")
+	if err != nil {
+		fmt.Println("Error al abrir el archivo", err.Error())
+		return
+	}
+	err = json.NewDecoder(inFile).Decode(&students)
+	if err != nil {
+		fmt.Println("Error de conversión", err.Error())
+		return
+	}
+	inFile.Close()
 
+	inFile, err = os.Open("../Storage/materias.txt")
+	if err != nil {
+		fmt.Println("Error al abrir el archivo", err.Error())
+		return
+	}
+	err = json.NewDecoder(inFile).Decode(&subjects)
+	if err != nil {
+		fmt.Println("Error de conversión", err.Error())
+		return
+	}
+	inFile.Close()
+
+	storageOptions(response, request)
+}
+
+func deleteMemory(response http.ResponseWriter, request *http.Request) {
+	students = make(map[string]map[string]float32)
+	subjects = make(map[string]map[string]float32)
+
+	storageOptions(response, request)
 }
 
 func main() {
@@ -203,6 +234,7 @@ func main() {
 	http.HandleFunc("/storage_options", storageOptions)
 	http.HandleFunc("/save_in_file", saveInFile)
 	http.HandleFunc("/load_from_file", loadFromFile)
+	http.HandleFunc("/delete_memory", deleteMemory)
 	fmt.Println("Servidor corriendo en:", host)
 	http.ListenAndServe(host, nil)
 }

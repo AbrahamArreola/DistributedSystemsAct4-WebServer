@@ -56,6 +56,11 @@
             window.location.replace("/load_from_file");
             alert("Información recuperada!")
         }
+
+        function clearMemory(){
+            window.location.replace("/delete_memory");
+            alert("Memoria eliminada!")
+        }
     </script>
 </head>
 <body>
@@ -63,6 +68,7 @@
         <h1>Opciones de almacenamiento</h1>
         <input type="submit" onclick="saveInFile()" value="Guardar en archivo">
         <input type="submit" onclick="loadfromFile()" value="Recuperar de archivo">
+        <input type="submit" onclick="clearMemory()" value="Vaciar memoria">
     </div>
 </body>
 </html>
